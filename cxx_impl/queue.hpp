@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+#include <cassert>
 #include <iostream>
 #include <optional>
 
@@ -59,7 +60,7 @@ template <class T> class MichaelScottQueue {
                     task = next.ptr->value;
                     if (Head.compare_exchange_strong(
                             head, TaggedPointer{next.ptr, head.refId + 1})) {
-                        std::cout << "pop\n";
+                        // std::cerr << "pop\n";
                         break;
                     }
                 }
@@ -80,11 +81,11 @@ template <class T> class MichaelScottQueue {
             TaggedPointer tail(Tail);
 
             // Read next ptr and count fields together
-            TaggedPointer next{
-                // ptr
-                (tail.ptr == nullptr) ? nullptr : tail.ptr->next.load().ptr,
-                // count
-                (tail.ptr == nullptr) ? 0 : tail.ptr->next.load().refId};
+            assert(tail.ptr != nullptr);
+            TaggedPointer next{// ptr
+                               tail.ptr->next.load().ptr,
+                               // count
+                               tail.ptr->next.load().refId};
 
             if (tail.refId == Tail.load().refId &&
                 tail.ptr == Tail.load().ptr) {
@@ -92,7 +93,7 @@ template <class T> class MichaelScottQueue {
                 if (next.ptr == nullptr) {
                     if (tail.ptr->next.compare_exchange_strong(
                             next, TaggedPointer{placeholder, next.refId + 1})) {
-                        std::cerr << "push\n";
+                        // std::cerr << "push\n";
                         break;
                     }
                     // increment Tail ptr while it is not queue tail in a CAS

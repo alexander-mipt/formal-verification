@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <thread>
 #include <vector>
+
+namespace {
 constexpr int TASKS_DEFAULT = 100;
 constexpr int PRODUCERS_DEFAULT = 2;
 constexpr int CONSUMERS_DEFAULT = 3;
@@ -23,11 +25,12 @@ void produce(Queue &q, int countLim) {
 
 void consume(Queue &q, int countLim) {
     while (poppedTaskCount < countLim) {
-        if (auto x = q.pop()) {
+        if (q.pop()) {
             ++poppedTaskCount;
         }
     }
 }
+} // namespace
 
 int main(int argc, char *argv[]) {
 
@@ -76,7 +79,7 @@ int main(int argc, char *argv[]) {
     // check
     auto diff = pushedTaskCount.load() - poppedTaskCount.load();
     if (diff != 0) {
-      std::cerr << "Error: missed tasks: " << diff << std::endl;
+        std::cerr << "Error: missed tasks: " << diff << std::endl;
     }
     return 0;
 }
