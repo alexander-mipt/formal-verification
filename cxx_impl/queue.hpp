@@ -60,7 +60,7 @@ template <class T> class MichaelScottQueue {
                     task = next.ptr->value;
                     if (Head.compare_exchange_strong(
                             head, TaggedPointer{next.ptr, head.refId + 1})) {
-                        // std::cerr << "pop\n";
+                        std::cerr << "pop\n";
                         break;
                     }
                 }
@@ -93,7 +93,7 @@ template <class T> class MichaelScottQueue {
                 if (next.ptr == nullptr) {
                     if (tail.ptr->next.compare_exchange_strong(
                             next, TaggedPointer{placeholder, next.refId + 1})) {
-                        // std::cerr << "push\n";
+                        std::cerr << "push\n";
                         break;
                     }
                     // increment Tail ptr while it is not queue tail in a CAS

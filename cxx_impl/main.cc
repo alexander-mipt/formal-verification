@@ -6,8 +6,8 @@
 
 namespace {
 constexpr int TASKS_DEFAULT = 100;
-constexpr int PRODUCERS_DEFAULT = 2;
-constexpr int CONSUMERS_DEFAULT = 3;
+constexpr int PRODUCERS_DEFAULT = 4;
+constexpr int CONSUMERS_DEFAULT = 10;
 
 std::atomic<int> pushedTaskCount{0};
 std::atomic<int> poppedTaskCount{0};
