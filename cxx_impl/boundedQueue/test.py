@@ -14,8 +14,12 @@ def checkSymbols(string: str) -> bool:
 	symbols2 = set()
 	for s in string:
 		if s not in symbols1:
+			if s in symbols1:
+				return False
 			symbols1.add(s)
 		else:
+			if s in symbols2:
+				return False
 			symbols2.add(s)
 	return symbols1 == symbols2
 
