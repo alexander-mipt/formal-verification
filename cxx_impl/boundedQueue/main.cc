@@ -9,11 +9,9 @@ namespace {
 
 constexpr bool DEF_VERBOSE = false;
 constexpr int DEF_BUFSIZE = 64;
-constexpr int DEF_NTASKS = 100;
-constexpr int DEF_NPROD = 1;
-constexpr int DEF_NCONS = 1;
-constexpr int DEF_PTIME = 1;
-constexpr int DEF_CTIME = 1;
+constexpr int DEF_NTASKS = 89;
+constexpr int DEF_NPROD = 10;
+constexpr int DEF_NCONS = 8;
 
 struct Config {
   bool Verbose = DEF_VERBOSE;
@@ -132,7 +130,7 @@ public:
 };
 
 std::atomic<int> NTasks;
-
+std::mutex mtx;
 void produce(lf_queue<int> &Q, Config Cfg) {
   for (;;) {
     int N = NTasks.load();
@@ -151,6 +149,11 @@ void produce(lf_queue<int> &Q, Config Cfg) {
     //std::this_thread::sleep_for(Cfg.PTime);
     while (!Q.push(N))
       std::this_thread::yield();
+	{
+		//std::lock_guard<std::mutex> lck(mtx);
+		//std::cerr << 'p' << N << '\n';
+		std::cerr << static_cast<char>(N + static_cast<int>('!'));
+	}
   }
 }
 
@@ -162,6 +165,11 @@ void consume(lf_queue<int> &Q, Config Cfg) {
     bool Succ = Q.pop(N);
     if (Succ) {
       //std::this_thread::sleep_for(Cfg.CTime);
+	  {
+		  // std::lock_guard<std::mutex> lck(mtx);
+	  	  // std::cerr << 'c' << N << std::endl;
+	      std::cerr << static_cast<char>(N + static_cast<int>('!'));
+	  }
     }
   }
 }
@@ -171,6 +179,7 @@ void consume(lf_queue<int> &Q, Config Cfg) {
 int main(int argc, char **argv) try {
   Config Cfg{};
   NTasks = Cfg.NTasks;
+  static_assert(DEF_NTASKS < 90);
 
   std::vector<std::thread> Producers;
   std::vector<std::thread> Consumers;
